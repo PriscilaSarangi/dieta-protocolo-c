@@ -1,0 +1,756 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Protocolo C</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;600;700&family=Inter:wght@300;400;500;600&display=swap');
+
+:root {
+  --green-deep: #1a3d2b;
+  --green-mid: #2d6a4f;
+  --green-light: #52b788;
+  --green-pale: #d8f3dc;
+  --green-wash: #f0faf3;
+  --red-berry: #c0392b;
+  --red-light: #fdecea;
+  --orange: #e07b39;
+  --orange-light: #fdf0e6;
+  --cream: #fdfcf8;
+  --warm-white: #f9f7f2;
+  --border: #e8e4d9;
+  --text: #1a1a16;
+  --muted: #6b6b5f;
+  --radius: 14px;
+  --shadow-sm: 0 1px 4px rgba(26,61,43,0.07);
+  --shadow-md: 0 4px 16px rgba(26,61,43,0.10);
+}
+
+* { box-sizing: border-box; margin: 0; padding: 0; }
+html { scroll-behavior: smooth; }
+body { font-family: 'Inter', sans-serif; background: var(--cream); color: var(--text); min-height: 100vh; }
+
+/* NAV */
+nav {
+  background: var(--green-deep);
+  position: sticky; top: 0; z-index: 200;
+  box-shadow: 0 2px 12px rgba(0,0,0,0.18);
+}
+.nav-inner {
+  max-width: 860px; margin: 0 auto; padding: 0 1.25rem;
+  display: flex; align-items: center; justify-content: space-between; height: 56px;
+}
+.nav-logo {
+  font-family: 'Playfair Display', serif;
+  font-size: 18px; font-weight: 700; color: #fff; letter-spacing: -0.01em;
+}
+.nav-logo span { color: var(--green-light); font-weight: 400; font-size: 13px; margin-left: 6px; font-family: 'Inter', sans-serif; letter-spacing: 0; }
+.nav-tabs { display: flex; gap: 2px; }
+.nav-tab {
+  font-size: 12.5px; padding: 6px 13px; border-radius: 8px;
+  border: none; background: transparent; color: rgba(255,255,255,0.65);
+  cursor: pointer; transition: all 0.15s; white-space: nowrap; font-family: 'Inter', sans-serif;
+}
+.nav-tab:hover { background: rgba(255,255,255,0.1); color: #fff; }
+.nav-tab.active { background: var(--green-light); color: var(--green-deep); font-weight: 600; }
+
+/* PAGES */
+.page { display: none; max-width: 860px; margin: 0 auto; padding: 2rem 1.25rem 5rem; }
+.page.active { display: block; }
+
+/* HERO */
+.hero {
+  position: relative; border-radius: 20px; overflow: hidden;
+  min-height: 300px; margin-bottom: 2rem;
+  background: var(--green-deep);
+}
+.hero-bg {
+  position: absolute; inset: 0;
+  background-image: url('https://images.unsplash.com/photo-1490645935967-10de6ba17061?w=1200&q=80');
+  background-size: cover; background-position: center;
+  opacity: 0.22;
+}
+.hero-content {
+  position: relative; z-index: 2; padding: 2.5rem 2.25rem;
+}
+.hero-eyebrow {
+  font-size: 11px; font-weight: 600; letter-spacing: 0.1em;
+  text-transform: uppercase; color: var(--green-light); margin-bottom: 10px;
+}
+.hero h1 {
+  font-family: 'Playfair Display', serif;
+  font-size: clamp(28px, 5vw, 40px); font-weight: 700; color: #fff;
+  letter-spacing: -0.02em; line-height: 1.15; margin-bottom: 12px;
+}
+.hero h1 em { color: var(--green-light); font-style: normal; }
+.hero p { font-size: 14.5px; color: rgba(255,255,255,0.78); line-height: 1.65; max-width: 520px; }
+
+.hero-phases {
+  display: flex; gap: 10px; margin-top: 1.75rem; flex-wrap: wrap;
+}
+.hero-phase {
+  background: rgba(255,255,255,0.1); border: 1px solid rgba(255,255,255,0.2);
+  backdrop-filter: blur(8px);
+  border-radius: 10px; padding: 10px 14px; font-size: 12px; color: rgba(255,255,255,0.9);
+}
+.hero-phase strong { display: block; color: var(--green-light); font-size: 11px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 3px; }
+
+/* DATE PICKER */
+.date-picker-card {
+  background: #fff; border: 1px solid var(--border);
+  border-radius: var(--radius); padding: 1.5rem 1.75rem;
+  margin-bottom: 1.5rem; box-shadow: var(--shadow-sm);
+  display: flex; align-items: center; gap: 1.5rem; flex-wrap: wrap;
+}
+.date-picker-card label {
+  font-size: 13px; font-weight: 600; color: var(--green-deep); white-space: nowrap;
+}
+.date-input {
+  padding: 9px 14px; border: 1.5px solid var(--border); border-radius: 8px;
+  font-size: 14px; font-family: 'Inter', sans-serif; color: var(--text);
+  background: var(--warm-white); outline: none; transition: border 0.15s;
+}
+.date-input:focus { border-color: var(--green-mid); }
+.date-btn {
+  padding: 9px 20px; background: var(--green-mid); color: #fff;
+  border: none; border-radius: 8px; font-size: 13px; font-weight: 600;
+  cursor: pointer; font-family: 'Inter', sans-serif; transition: opacity 0.15s;
+}
+.date-btn:hover { opacity: 0.88; }
+.date-result {
+  font-size: 13px; color: var(--muted); line-height: 1.6;
+}
+.date-result strong { color: var(--green-deep); }
+
+/* PHASE STRIP */
+.phase-strip { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; margin-bottom: 1.5rem; }
+.phase-card {
+  background: #fff; border: 1px solid var(--border); border-radius: var(--radius);
+  padding: 1rem 1.1rem; box-shadow: var(--shadow-sm); position: relative; overflow: hidden;
+}
+.phase-card::before {
+  content: ''; position: absolute; top: 0; left: 0; right: 0; height: 3px;
+}
+.phase-card.p1::before { background: var(--green-mid); }
+.phase-card.p2::before { background: var(--orange); }
+.phase-card.p3::before { background: var(--red-berry); }
+.phase-num { font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.08em; color: var(--muted); margin-bottom: 5px; }
+.phase-name { font-family: 'Playfair Display', serif; font-size: 16px; font-weight: 600; color: var(--green-deep); margin-bottom: 4px; }
+.phase-desc { font-size: 12px; color: var(--muted); line-height: 1.55; }
+
+/* SECTION LABEL */
+.section-label {
+  font-size: 11px; font-weight: 700; color: var(--muted);
+  letter-spacing: 0.08em; text-transform: uppercase; margin: 1.75rem 0 0.8rem;
+  display: flex; align-items: center; gap: 8px;
+}
+.section-label::after { content: ''; flex: 1; height: 1px; background: var(--border); }
+
+/* CARDS */
+.card {
+  background: #fff; border: 1px solid var(--border);
+  border-radius: var(--radius); padding: 1.1rem 1.35rem;
+  margin-bottom: 10px; box-shadow: var(--shadow-sm);
+}
+.card-title { font-size: 14px; font-weight: 600; color: var(--green-deep); margin-bottom: 7px; }
+.card-body { font-size: 13px; color: var(--muted); line-height: 1.75; }
+.card-body li { list-style: none; margin-bottom: 4px; padding-left: 14px; position: relative; }
+.card-body li::before { content: "·"; position: absolute; left: 0; color: var(--green-light); font-weight: 700; }
+
+.badge {
+  display: inline-block; font-size: 11px; font-weight: 600;
+  padding: 3px 10px; border-radius: 20px; margin-bottom: 8px; letter-spacing: 0.02em;
+}
+.badge-green { background: var(--green-pale); color: var(--green-deep); }
+.badge-red { background: var(--red-light); color: var(--red-berry); }
+.badge-amber { background: var(--orange-light); color: #854f0b; }
+.badge-blue { background: #e8f0fd; color: #1a56a0; }
+.badge-gray { background: var(--warm-white); color: #555; border: 1px solid var(--border); }
+
+.tip {
+  font-size: 13px; color: var(--green-deep);
+  background: var(--green-wash); border-left: 3px solid var(--green-mid);
+  padding: 11px 15px; border-radius: 0 var(--radius) var(--radius) 0; margin: 12px 0; line-height: 1.65;
+}
+.warn-box {
+  font-size: 13px; color: #7a2020;
+  background: var(--red-light); border: 1px solid #f5c6c2;
+  border-radius: var(--radius); padding: 11px 15px; margin-bottom: 14px; line-height: 1.65;
+}
+
+/* GRID */
+.grid2 { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+.grid3 { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; }
+.meal-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(210px, 1fr)); gap: 10px; }
+
+/* DAY TABS */
+.day-tabs { display: flex; gap: 7px; flex-wrap: wrap; margin-bottom: 1.1rem; }
+.day-tab {
+  font-size: 12.5px; padding: 6px 14px; border-radius: 20px;
+  border: 1.5px solid var(--border); background: #fff; color: var(--muted);
+  cursor: pointer; transition: all 0.15s; font-weight: 500;
+}
+.day-tab:hover { border-color: var(--green-mid); color: var(--green-mid); }
+.day-tab.active { background: var(--green-deep); color: #fff; border-color: var(--green-deep); }
+.day-panel { display: none; }
+.day-panel.active { display: block; }
+
+/* MEAL CARDS */
+.meal-card {
+  background: #fff; border: 1px solid var(--border);
+  border-radius: var(--radius); padding: 1rem 1.1rem; box-shadow: var(--shadow-sm);
+}
+.meal-time {
+  font-size: 10.5px; font-weight: 700; color: var(--green-mid);
+  text-transform: uppercase; letter-spacing: 0.07em; margin-bottom: 5px;
+}
+.meal-name { font-size: 13.5px; font-weight: 600; color: var(--green-deep); margin-bottom: 8px; line-height: 1.35; }
+.meal-items { font-size: 12.5px; color: var(--muted); line-height: 1.7; list-style: none; }
+.meal-items li { padding-left: 12px; position: relative; margin-bottom: 2px; }
+.meal-items li::before { content: "·"; position: absolute; left: 0; color: var(--green-light); font-weight: 700; }
+.day-tip {
+  font-size: 12.5px; color: #7a4a10;
+  background: var(--orange-light); border-left: 3px solid var(--orange);
+  padding: 9px 13px; border-radius: 0 8px 8px 0; margin-top: 12px; line-height: 1.6;
+}
+.prep-note {
+  font-size: 12.5px; color: var(--green-deep); background: var(--green-wash);
+  border: 1px solid var(--green-pale); border-radius: 8px;
+  padding: 9px 13px; margin-top: 8px; line-height: 1.6;
+}
+
+/* IMAGE STRIP */
+.img-strip { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; margin-bottom: 1.5rem; border-radius: 16px; overflow: hidden; }
+.img-strip-item { aspect-ratio: 4/3; overflow: hidden; }
+.img-strip-item img { width: 100%; height: 100%; object-fit: cover; transition: transform 0.4s; }
+.img-strip-item img:hover { transform: scale(1.04); }
+
+/* LINKS */
+.link-card {
+  background: #fff; border: 1px solid var(--border); border-radius: var(--radius);
+  padding: 1.1rem 1.35rem; margin-bottom: 10px; text-decoration: none;
+  display: flex; align-items: flex-start; gap: 14px;
+  transition: all 0.18s; box-shadow: var(--shadow-sm);
+}
+.link-card:hover { border-color: var(--green-mid); transform: translateY(-2px); box-shadow: var(--shadow-md); }
+.link-icon {
+  width: 38px; height: 38px; border-radius: 10px;
+  background: var(--green-pale); display: flex; align-items: center; justify-content: center;
+  font-size: 18px; flex-shrink: 0; margin-top: 2px;
+}
+.link-body { flex: 1; }
+.link-title { font-size: 14px; font-weight: 600; color: var(--green-deep); margin-bottom: 4px; }
+.link-desc { font-size: 12.5px; color: var(--muted); line-height: 1.6; margin-bottom: 5px; }
+.link-tag { font-size: 11.5px; color: var(--green-mid); font-weight: 600; }
+
+/* CHAT */
+.chat-outer { display: flex; flex-direction: column; height: calc(100vh - 200px); min-height: 420px; }
+.chat-messages { flex: 1; overflow-y: auto; padding: 0.5rem 0 1rem; display: flex; flex-direction: column; gap: 12px; }
+.msg { max-width: 82%; display: flex; flex-direction: column; }
+.msg.user { align-self: flex-end; }
+.msg.bot { align-self: flex-start; }
+.msg-bubble { padding: 11px 16px; border-radius: 16px; font-size: 13.5px; line-height: 1.65; }
+.msg.user .msg-bubble { background: var(--green-deep); color: #fff; border-bottom-right-radius: 4px; }
+.msg.bot .msg-bubble { background: #fff; border: 1px solid var(--border); color: var(--text); border-bottom-left-radius: 4px; box-shadow: var(--shadow-sm); }
+.msg-bubble li { list-style: none; margin-bottom: 3px; padding-left: 14px; position: relative; }
+.msg-bubble li::before { content: "·"; position: absolute; left: 0; color: var(--green-light); font-weight: 700; }
+.msg-bubble strong { font-weight: 600; color: var(--green-deep); }
+.msg.user .msg-bubble strong { color: var(--green-light); }
+.chat-input-wrap {
+  display: flex; gap: 8px; padding-top: 14px; border-top: 1px solid var(--border);
+}
+.chat-input {
+  flex: 1; padding: 11px 16px; border: 1.5px solid var(--border);
+  border-radius: 24px; font-size: 14px; font-family: 'Inter', sans-serif;
+  outline: none; background: #fff; color: var(--text); transition: border 0.15s;
+}
+.chat-input:focus { border-color: var(--green-mid); }
+.chat-send {
+  padding: 11px 22px; background: var(--green-deep); color: #fff;
+  border: none; border-radius: 24px; font-size: 13.5px; font-weight: 600;
+  cursor: pointer; font-family: 'Inter', sans-serif; transition: all 0.15s;
+}
+.chat-send:hover { background: var(--green-mid); }
+.chat-send:disabled { opacity: 0.5; cursor: not-allowed; }
+.typing { display: flex; align-items: center; gap: 5px; padding: 12px 16px; background: #fff; border: 1px solid var(--border); border-radius: 16px; border-bottom-left-radius: 4px; width: fit-content; box-shadow: var(--shadow-sm); }
+.dot { width: 7px; height: 7px; background: var(--green-light); border-radius: 50%; animation: bounce 1.2s infinite; }
+.dot:nth-child(2) { animation-delay: 0.2s; }
+.dot:nth-child(3) { animation-delay: 0.4s; }
+@keyframes bounce { 0%,60%,100%{transform:translateY(0)} 30%{transform:translateY(-6px)} }
+
+/* DIVIDER */
+.divider { height: 1px; background: var(--border); margin: 1.5rem 0; }
+
+@media (max-width: 600px) {
+  .grid2, .grid3, .phase-strip { grid-template-columns: 1fr; }
+  .nav-tabs { gap: 0; }
+  .nav-tab { padding: 5px 8px; font-size: 11.5px; }
+  .img-strip { grid-template-columns: 1fr 1fr; }
+  .img-strip-item:last-child { display: none; }
+}
+</style>
+</head>
+<body>
+
+<nav>
+  <div class="nav-inner">
+    <div class="nav-logo">Protocolo C <span>Intestino & Inflamação</span></div>
+    <div class="nav-tabs">
+      <button class="nav-tab active" onclick="goPage('home',this)">Início</button>
+      <button class="nav-tab" onclick="goPage('cardapio',this)">Cardápio</button>
+      <button class="nav-tab" onclick="goPage('evitar',this)">Evitar</button>
+      <button class="nav-tab" onclick="goPage('links',this)">Referências</button>
+      <button class="nav-tab" onclick="goPage('chat',this)">Assistente</button>
+    </div>
+  </div>
+</nav>
+
+<!-- HOME -->
+<div id="page-home" class="page active">
+
+  <div class="hero">
+    <div class="hero-bg"></div>
+    <div class="hero-content">
+      <div class="hero-eyebrow">Programa de 30 dias</div>
+      <h1>Desinflamar.<br><em>Recolonizar.</em><br>Liberar.</h1>
+      <p>Protocolo faseado para reduzir zonulina, restaurar a barreira intestinal e eliminar gordura abdominal de origem hormonal.</p>
+      <div class="hero-phases">
+        <div class="hero-phase"><strong>Fase 1 · 7 dias</strong>Acalmar o intestino</div>
+        <div class="hero-phase"><strong>Fase 2 · 3 dias</strong>Suco enzimático</div>
+        <div class="hero-phase"><strong>Fase 3 · 20 dias</strong>Recolonizar com butirato</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- DATE PICKER -->
+  <div class="date-picker-card">
+    <label>Quando você começa?</label>
+    <input type="date" class="date-input" id="start-date" />
+    <button class="date-btn" onclick="calcDates()">Calcular</button>
+    <div class="date-result" id="date-result">Escolha a data de início e veja o calendário completo do protocolo.</div>
+  </div>
+
+  <div class="img-strip">
+    <div class="img-strip-item"><img src="https://images.unsplash.com/photo-1464965911861-746a04b4bca6?w=600&q=80" alt="Frutas vermelhas" loading="lazy" /></div>
+    <div class="img-strip-item"><img src="https://images.unsplash.com/photo-1512621776951-a57141f2eefd?w=600&q=80" alt="Vegetais coloridos" loading="lazy" /></div>
+    <div class="img-strip-item"><img src="https://images.unsplash.com/photo-1490474418585-ba9bad8fd0ea?w=600&q=80" alt="Suco verde" loading="lazy" /></div>
+  </div>
+
+  <div class="section-label">As três fases</div>
+  <div class="phase-strip">
+    <div class="phase-card p1">
+      <div class="phase-num">Fase 1 · 7 dias</div>
+      <div class="phase-name">Acalmar</div>
+      <div class="phase-desc">Dieta low-FODMAP elimina os principais gatilhos de zonulina. Reduz fermentação, inchaço e inflamação intestinal.</div>
+    </div>
+    <div class="phase-card p2">
+      <div class="phase-num">Fase 2 · 3 dias</div>
+      <div class="phase-name">Expurgar</div>
+      <div class="phase-desc">Suco enzimático matinal em jejum. Reduz bactérias nocivas e permeabilidade intestinal.</div>
+    </div>
+    <div class="phase-card p3">
+      <div class="phase-num">Fase 3 · 20 dias</div>
+      <div class="phase-name">Recolonizar</div>
+      <div class="phase-desc">Alimentos geradores de butirato estimulam Akkermansia e produção natural de GLP-1.</div>
+    </div>
+  </div>
+
+  <div class="section-label">Por que só a barriga acumula</div>
+  <div class="card">
+    <div class="card-title">Gordura visceral tem origem hormonal, não calórica</div>
+    <div class="card-body">O acúmulo abdominal isolado é o sinal clássico de cortisol elevado cronicamente combinado com resistência à insulina. Quando o intestino está permeável, bactérias gram-negativas liberam LPS na corrente sanguínea — isso eleva cortisol, que sinaliza ao corpo para estocar gordura especificamente no abdômen. A zonulina é a proteína que abre as junções do intestino. Reduzir a zonulina é o mecanismo central desse protocolo.</div>
+  </div>
+  <div class="grid2">
+    <div class="card">
+      <div class="badge badge-red">Gatilho principal</div>
+      <div class="card-title">Intestino permeável + LPS</div>
+      <div class="card-body">LPS de bactérias gram-negativas vaza para o sangue, eleva PCR e cortisol cronicamente, bloqueando a queima de gordura.</div>
+    </div>
+    <div class="card">
+      <div class="badge badge-green">O mecanismo de saída</div>
+      <div class="card-title">GLP-1 endógeno</div>
+      <div class="card-body">Akkermansia muciniphila estimula produção natural de GLP-1 — o mesmo mecanismo do Ozempic — regulando insulina e apetite sem medicamento.</div>
+    </div>
+  </div>
+  <div class="tip">80% das refeições certas já produz resultado. Os 20% restantes não desfazem o trabalho se a base estiver sólida.</div>
+</div>
+
+<!-- CARDÁPIO -->
+<div id="page-cardapio" class="page">
+
+  <div class="date-picker-card" style="margin-bottom:1.5rem;">
+    <label>Data de início da Fase 1</label>
+    <input type="date" class="date-input" id="start-date-2" />
+    <button class="date-btn" onclick="calcDates2()">Gerar dias</button>
+    <div class="date-result" id="date-result-2">Escolha quando começa para ver o calendário personalizado.</div>
+  </div>
+
+  <div class="warn-box">Proibidos na Fase 1: glúten, alho, cebola, laticínios convencionais, feijão, brócolis, industrializados e álcool.<br>Tempero base permitido: cebolinha verde + salsinha + salsão + limão + azeite.</div>
+
+  <div class="day-tabs" id="day-tabs"></div>
+  <div id="day-panels"></div>
+
+  <div class="section-label">Café da manhã — 5 opções rápidas</div>
+  <div class="meal-grid">
+    <div class="meal-card"><div class="meal-time">5 min</div><div class="meal-name">Tapioca de ovo</div><ul class="meal-items"><li>3 col. sopa de goma de tapioca</li><li>2 ovos mexidos temperados</li><li>Cebolinha verde + azeite + sal</li><li>Café puro</li></ul></div>
+    <div class="meal-card"><div class="meal-time">5 min</div><div class="meal-name">Omelete rápida</div><ul class="meal-items"><li>3 ovos batidos com cúrcuma e sal</li><li>Frigideira tampada fogo baixo 5 min</li><li>Mamão ou cenoura ao lado</li><li>Café puro</li></ul></div>
+    <div class="meal-card"><div class="meal-time">Sem preparo</div><div class="meal-name">Ovo cozido + fruta</div><ul class="meal-items"><li>2 ovos cozidos na véspera</li><li>200g mamão papaia</li><li>Água morna com limão antes</li><li>Café puro</li></ul></div>
+    <div class="meal-card"><div class="meal-time">8 min</div><div class="meal-name">Frango com tapioca</div><ul class="meal-items"><li>Sobra de frango desfiado</li><li>Tapioca + frango + limão + azeite</li><li>Cebolinha verde</li><li>Café puro</li></ul></div>
+    <div class="meal-card"><div class="meal-time">5 min</div><div class="meal-name">Tapioca com amendoim</div><ul class="meal-items"><li>3 col. sopa de goma de tapioca</li><li>1 col. sopa de pasta de amendoim pura</li><li>1/3 banana-prata fatiada</li><li>Café puro</li></ul></div>
+  </div>
+
+  <div class="section-label">Jantar — 5 opções rápidas</div>
+  <div class="meal-grid">
+    <div class="meal-card"><div class="meal-time">10 min</div><div class="meal-name">Ovo com legumes</div><ul class="meal-items"><li>3 ovos mexidos ou omelete</li><li>Abobrinha + cenoura no azeite</li><li>Cúrcuma + sal + salsinha</li><li>Sem arroz</li></ul></div>
+    <div class="meal-card"><div class="meal-time">5 min</div><div class="meal-name">Frango com salada</div><ul class="meal-items"><li>Sobra de frango cozido</li><li>Alface + pepino + cenoura ralada</li><li>Limão + azeite + sal</li></ul></div>
+    <div class="meal-card"><div class="meal-time">15 min</div><div class="meal-name">Sopa com ovo</div><ul class="meal-items"><li>Cenoura, abobrinha, batata-inglesa</li><li>Caldo com gengibre</li><li>1 ovo pochê por cima</li><li>Azeite + salsinha</li></ul></div>
+    <div class="meal-card"><div class="meal-time">10 min</div><div class="meal-name">Sardinha + batata-doce</div><ul class="meal-items"><li>1 lata de sardinha na água</li><li>Limão + azeite + sal</li><li>1/2 batata-doce na air fryer 10 min</li><li>Alface ao lado</li></ul></div>
+    <div class="meal-card"><div class="meal-time">5 min</div><div class="meal-name">Atum com pepino</div><ul class="meal-items"><li>1 lata de atum na água</li><li>Pepino fatiado + cenoura ralada</li><li>Limão + azeite + sal</li></ul></div>
+  </div>
+</div>
+
+<!-- EVITAR -->
+<div id="page-evitar" class="page">
+  <div class="img-strip" style="margin-bottom:1.5rem;">
+    <div class="img-strip-item"><img src="https://images.unsplash.com/photo-1512621776951-a57141f2eefd?w=600&q=80" alt="Vegetais frescos" loading="lazy" /></div>
+    <div class="img-strip-item"><img src="https://images.unsplash.com/photo-1498837167922-ddd27525d352?w=600&q=80" alt="Alimentos saudáveis" loading="lazy" /></div>
+    <div class="img-strip-item"><img src="https://images.unsplash.com/photo-1464965911861-746a04b4bca6?w=600&q=80" alt="Frutas vermelhas" loading="lazy" /></div>
+  </div>
+
+  <div class="section-label">Cortar agora</div>
+  <div class="card"><div class="badge badge-red">Eliminar — Fase 1</div><div class="card-body"><ul>
+    <li>Açúcar e adoçantes, especialmente refrigerante diet</li>
+    <li>Pão francês, massas e farinha de trigo no café da manhã</li>
+    <li>Álcool — especialmente cerveja e vinho tinto em excesso</li>
+    <li>Óleos vegetais industrializados: soja, canola, girassol</li>
+    <li>Ultraprocessados: salgadinho, biscoito recheado, embutidos</li>
+    <li>Frituras em óleo reutilizado</li>
+    <li>Alho e cebola (Fase 1 apenas) — voltam após reintrodução</li>
+  </ul></div></div>
+
+  <div class="section-label">Moderar</div>
+  <div class="card"><div class="badge badge-amber">Com critério</div><div class="card-body"><ul>
+    <li>Pão — se comer, sempre acompanhado de proteína ou gordura</li>
+    <li>Arroz branco em excesso sem proteína junto</li>
+    <li>Café com açúcar — reduzir gradualmente</li>
+    <li>Salgados fit GymChef — ok até 1 por dia, não como refeição principal</li>
+    <li>Frutas de alto IG em jejum: manga, uva, melancia</li>
+  </ul></div></div>
+
+  <div class="section-label">Pode manter</div>
+  <div class="card"><div class="badge badge-green">Liberado</div><div class="card-body"><ul>
+    <li>Alho e cebola cozidos — após Fase 1, em quantidade moderada</li>
+    <li>Café puro sem açúcar — antiinflamatório em até 2 xícaras por dia</li>
+    <li>Arroz branco com proteína junto — ok no almoço</li>
+    <li>Feijão — fonte de butirato, manter na Fase 3</li>
+    <li>Ovo — sem restrição, todos os dias</li>
+    <li>Azeite extravirgem — usar com liberdade</li>
+    <li>Sardinha e atum na água — fontes baratas de ômega-3</li>
+    <li>Batata-doce, batata-inglesa, mandioquinha</li>
+  </ul></div></div>
+
+  <div class="section-label">Zonulina: maiores gatilhos</div>
+  <div class="card">
+    <div class="card-title">O que abre as junções intestinais</div>
+    <div class="card-body">A zonulina é liberada principalmente por dois estímulos: gliadina (proteína do glúten) e LPS de bactérias gram-negativas. A Fase 1 elimina o glúten. A Fase 2 reduz a carga bacteriana patogênica. Juntas, removem os dois maiores ativadores de zonulina e iniciam o fechamento da barreira intestinal.</div>
+  </div>
+
+  <div class="section-label">Chás recomendados à noite</div>
+  <div class="grid2">
+    <div class="card"><div class="card-body"><ul>
+      <li><strong>Camomila</strong> — antiinflamatória, reduz cortisol noturno</li>
+      <li><strong>Melissa</strong> — eixo intestino-cérebro, ansiedade</li>
+      <li><strong>Erva-doce</strong> — gases e conforto intestinal</li>
+    </ul></div></div>
+    <div class="card"><div class="card-body"><ul>
+      <li><strong>Gengibre + limão</strong> — digestivo, antimicrobiano</li>
+      <li><strong>Hortelã-pimenta</strong> — relaxa musculatura intestinal</li>
+      <li>Sem adoçar. Se precisar de dulçor: 1 rodela de limão.</li>
+    </ul></div></div>
+  </div>
+</div>
+
+<!-- LINKS -->
+<div id="page-links" class="page">
+  <div class="section-label">Ciência do intestino e zonulina</div>
+
+  <a class="link-card" href="https://www.ncbi.nlm.nih.gov/pmc/articles/PMC3384703/" target="_blank">
+    <div class="link-icon">🔬</div>
+    <div class="link-body"><div class="link-title">Leaky Gut and Autoimmune Diseases — Alessio Fasano</div><div class="link-desc">Artigo seminal do Dr. Fasano (Harvard) sobre permeabilidade intestinal, zonulina e doenças autoimunes. A base científica central do protocolo.</div><div class="link-tag">PubMed · Fasano Lab →</div></div>
+  </a>
+
+  <a class="link-card" href="https://www.monashfodmap.com/about-fodmap-and-ibs/" target="_blank">
+    <div class="link-icon">🌿</div>
+    <div class="link-body"><div class="link-title">O que são FODMAPs? — Universidade de Monash</div><div class="link-desc">Fonte original da pesquisa em FODMAPs que embasa a Fase 1. A Monash mantém a lista atualizada de alimentos e classificações.</div><div class="link-tag">monashfodmap.com →</div></div>
+  </a>
+
+  <a class="link-card" href="https://www.ncbi.nlm.nih.gov/pmc/articles/PMC6389720/" target="_blank">
+    <div class="link-icon">🦠</div>
+    <div class="link-body"><div class="link-title">Akkermansia muciniphila e saúde metabólica</div><div class="link-desc">Revisão sobre o papel da Akkermansia na regulação do peso, GLP-1 e resistência à insulina. Central para a Fase 3.</div><div class="link-tag">PubMed · Microbiota →</div></div>
+  </a>
+
+  <a class="link-card" href="https://www.ncbi.nlm.nih.gov/pmc/articles/PMC4992898/" target="_blank">
+    <div class="link-icon">🧬</div>
+    <div class="link-body"><div class="link-title">Butirato como modulador da barreira intestinal</div><div class="link-desc">Como o butirato produzido pela fermentação de fibras nutre os colonócitos e restaura a integridade da barreira intestinal.</div><div class="link-tag">PubMed · Butirato →</div></div>
+  </a>
+
+  <div class="section-label">Gordura abdominal e cortisol</div>
+
+  <a class="link-card" href="https://www.ncbi.nlm.nih.gov/pmc/articles/PMC5958156/" target="_blank">
+    <div class="link-icon">⚡</div>
+    <div class="link-body"><div class="link-title">Cortisol e acúmulo de gordura visceral</div><div class="link-desc">Revisão sobre o mecanismo pelo qual o cortisol crônico direciona gordura para o abdômen e bloqueia a lipólise.</div><div class="link-tag">PubMed · Cortisol →</div></div>
+  </a>
+
+  <a class="link-card" href="https://www.ncbi.nlm.nih.gov/pmc/articles/PMC6566660/" target="_blank">
+    <div class="link-icon">💊</div>
+    <div class="link-body"><div class="link-title">GLP-1 endógeno, microbiota e apetite</div><div class="link-desc">Como bactérias intestinais estimulam GLP-1 natural — o mesmo mecanismo do Ozempic e Mounjaro, sem medicamento.</div><div class="link-tag">PubMed · GLP-1 →</div></div>
+  </a>
+
+  <div class="section-label">Leitura acessível em português</div>
+
+  <a class="link-card" href="https://drauziovarella.uol.com.br/microbioma/" target="_blank">
+    <div class="link-icon">📖</div>
+    <div class="link-body"><div class="link-title">Microbioma intestinal — Drauzio Varella</div><div class="link-desc">Conteúdo acessível em português sobre microbiota, saúde intestinal e imunidade. Boa entrada sem jargão técnico.</div><div class="link-tag">drauziovarella.uol.com.br →</div></div>
+  </a>
+</div>
+
+<!-- CHAT -->
+<div id="page-chat" class="page">
+  <div class="card" style="margin-bottom:1.25rem; border-left: 3px solid var(--green-mid);">
+    <div class="card-title">Assistente do Protocolo C</div>
+    <div class="card-body">Descreva o que você tem em casa, qual refeição é (café, almoço ou jantar) e quanto tempo tem para preparar. O assistente sugere algo dentro do protocolo. Também responde dúvidas sobre as fases, zonulina, microbiota e qualquer tema relacionado.</div>
+  </div>
+  <div class="chat-outer">
+    <div class="chat-messages" id="chat-messages">
+      <div class="msg bot"><div class="msg-bubble">Oi, Pri. Me conta o que você tem disponível agora: os ingredientes, qual refeição é e quanto tempo tem para preparar. Sugiro algo dentro do protocolo.</div></div>
+    </div>
+    <div class="chat-input-wrap">
+      <input class="chat-input" id="chat-input" type="text" placeholder="Ex: tenho ovo, abobrinha e cenoura. É jantar, tenho 10 min." />
+      <button class="chat-send" id="chat-send" onclick="sendMessage()">Enviar</button>
+    </div>
+  </div>
+</div>
+
+<script>
+// NAV
+function goPage(id, el) {
+  document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+  document.querySelectorAll('.nav-tab').forEach(t => t.classList.remove('active'));
+  document.getElementById('page-' + id).classList.add('active');
+  el.classList.add('active');
+  window.scrollTo(0,0);
+}
+
+// DATE CALC
+function formatDate(d) {
+  return d.toLocaleDateString('pt-BR', { weekday: 'long', day: '2-digit', month: 'long' });
+}
+function addDays(d, n) { const r = new Date(d); r.setDate(r.getDate() + n); return r; }
+
+function calcDates() { calcDatesFrom('start-date', 'date-result'); }
+function calcDates2() {
+  calcDatesFrom('start-date-2', 'date-result-2');
+  buildDayTabs(document.getElementById('start-date-2').value);
+}
+
+function calcDatesFrom(inputId, resultId) {
+  const val = document.getElementById(inputId).value;
+  if (!val) { document.getElementById(resultId).innerHTML = 'Selecione uma data.'; return; }
+  const start = new Date(val + 'T12:00:00');
+  const f1end = addDays(start, 6);
+  const f2start = addDays(start, 7);
+  const f2end = addDays(start, 9);
+  const f3start = addDays(start, 10);
+  const f3end = addDays(start, 29);
+  document.getElementById(resultId).innerHTML =
+    `<strong>Fase 1</strong> ${formatDate(start)} → ${formatDate(f1end)} &nbsp;·&nbsp; ` +
+    `<strong>Fase 2</strong> ${formatDate(f2start)} → ${formatDate(f2end)} &nbsp;·&nbsp; ` +
+    `<strong>Fase 3</strong> ${formatDate(f3start)} → ${formatDate(f3end)}`;
+}
+
+// DAYS DATA
+const dayTemplates = [
+  { sub: "Dia 1 — começa no almoço", tip: "Primeiro dia: comece pelo almoço. Café da manhã já foi, sem compensação.", prep: "Hoje: descongele o frango, cozinhe o arroz, faça a pasta de tempero (cebolinha + salsinha + salsão + limão + azeite) e corte cenoura em palitos.", meals: [
+    { time: "Agora", name: "Água morna com limão", items: ["1 copo — sinaliza o início do protocolo"] },
+    { time: "Almoço", name: "Frango desfiado com arroz e abobrinha", items: ["150g frango cozido desfiado","Pasta de tempero + limão + azeite","1/2 xíc. arroz branco","Abobrinha refogada com cúrcuma"] },
+    { time: "Lanche", name: "Cenoura em palito", items: ["Cenoura crua + sal + limão"] },
+    { time: "Jantar", name: "Sopa de legumes", items: ["Cenoura, batata-inglesa, salsão","Caldo com gengibre e sal","Fio de azeite no final"] },
+    { time: "21h00", name: "Chá", items: ["Camomila sem adoçar"] }
+  ]},
+  { sub: "Dia 2", tip: "Dia de descanso. Prefira refeições simples.", meals: [
+    { time: "06h30", name: "Água morna com limão", items: ["1 copo em jejum"] },
+    { time: "07h30", name: "Tapioca de ovo com cebolinha", items: ["3 col. sopa goma de tapioca","1 ovo mexido","Cebolinha verde + azeite + sal"] },
+    { time: "10h00", name: "Lanche", items: ["200g mamão papaia"] },
+    { time: "12h30", name: "Bowl de atum com arroz e salada", items: ["1 lata atum na água","Cenoura ralada + pepino + pimentão","Limão + azeite + sal","1/2 xíc. arroz branco"] },
+    { time: "15h30", name: "Lanche", items: ["1 ovo cozido + pitada de sal"] },
+    { time: "19h00", name: "Frango com batata-inglesa", items: ["Frango desfiado","2 batatas cozidas amassadas com azeite","Salsinha por cima"] },
+    { time: "21h00", name: "Chá", items: ["Melissa sem adoçar"] }
+  ]},
+  { sub: "Dia 3", tip: "Dia de semana: use as preparações do dia anterior para montar rápido.", meals: [
+    { time: "06h30", name: "Água morna com limão", items: ["1 copo em jejum"] },
+    { time: "07h30", name: "Tapioca com pasta de amendoim", items: ["3 col. sopa goma de tapioca","1 col. sopa pasta de amendoim pura","1/3 banana-prata fatiada"] },
+    { time: "10h00", name: "Lanche", items: ["Pepino fatiado com limão e sal"] },
+    { time: "12h30", name: "Frango grelhado com batata-doce e espinafre", items: ["150g peito de frango","Pasta de tempero + limão","1 batata-doce na air fryer 200° 20 min","Espinafre refogado no azeite"] },
+    { time: "15h30", name: "Lanche", items: ["Cenoura + pasta de amendoim (1 col. sopa)"] },
+    { time: "19h00", name: "Omelete de espinafre", items: ["3 ovos com espinafre picado","Sal, azeite, cúrcuma","Frigideira tampada fogo baixo 8 min"] },
+    { time: "21h00", name: "Chá", items: ["Erva-doce sem adoçar"] }
+  ]},
+  { sub: "Dia 4", tip: "Metade da Fase 1. Queda de energia é normal — o intestino está se ajustando.", meals: [
+    { time: "06h30", name: "Água morna com limão", items: ["1 copo em jejum"] },
+    { time: "07h30", name: "Arroz com ovo e azeite", items: ["1/2 xíc. arroz requentado","1 ovo frito no azeite","Sal + salsinha picada"] },
+    { time: "10h00", name: "Lanche", items: ["200g mamão papaia"] },
+    { time: "12h30", name: "Sardinha refogada com arroz e salada", items: ["1 lata sardinha na água","Azeite, limão, cebolinha verde","1/2 xíc. arroz branco","Alface + pepino + cenoura"] },
+    { time: "15h30", name: "Lanche", items: ["Tapioca fina com azeite e sal"] },
+    { time: "19h00", name: "Caldo de frango com legumes", items: ["Caldo do frango","Cenoura e batata-inglesa em cubos","Gengibre + sal + salsinha"] },
+    { time: "21h00", name: "Chá", items: ["Camomila sem adoçar"] }
+  ]},
+  { sub: "Dia 5", tip: "A partir daqui o corpo costuma sinalizar melhora no inchaço.", meals: [
+    { time: "06h30", name: "Água morna com limão", items: ["1 copo em jejum"] },
+    { time: "07h30", name: "Tapioca de ovo com cebolinha", items: ["3 col. sopa goma de tapioca","2 ovos mexidos","Cebolinha verde + azeite + sal"] },
+    { time: "10h00", name: "Lanche", items: ["Cenoura em palito com sal e limão"] },
+    { time: "12h30", name: "Frango com arroz, pimentão e cenoura", items: ["150g frango grelhado","Pimentão vermelho + cenoura salteados","1/2 xíc. arroz branco"] },
+    { time: "15h30", name: "Lanche", items: ["1 ovo cozido + 10 amendoins torrados"] },
+    { time: "19h00", name: "Batata-doce com ovo", items: ["1 batata-doce na air fryer","2 ovos mexidos com cúrcuma","Salsinha por cima"] },
+    { time: "21h00", name: "Chá", items: ["Melissa sem adoçar"] }
+  ]},
+  { sub: "Dia 6", tip: "Penúltimo dia. Verifique o que sobrou de ingredientes.", prep: "Confira o estoque: se o mamão acabou, substitua o lanche por cenoura ou ovo cozido. Verifique o que precisa comprar para a Fase 2 (couve, maçã verde, pepino fresco).", meals: [
+    { time: "06h30", name: "Água morna com limão", items: ["1 copo em jejum"] },
+    { time: "07h30", name: "Cuscuz com ovo cozido", items: ["4 col. sopa cuscuz hidratado com água morna e sal","1 ovo cozido fatiado","Fio de azeite"] },
+    { time: "10h00", name: "Lanche", items: ["Pepino fatiado com limão e sal"] },
+    { time: "12h30", name: "Atum com batata-inglesa e salada", items: ["1 lata atum na água","2 batatas-inglesas cozidas","Alface + cenoura ralada + limão + azeite"] },
+    { time: "15h30", name: "Lanche", items: ["Tapioca com pasta de amendoim"] },
+    { time: "19h00", name: "Sopa de legumes com espinafre", items: ["Cenoura, abobrinha, salsão em cubos","Caldo com gengibre","Espinafre com fogo desligado + tampado 2 min","Azeite e sal"] },
+    { time: "21h00", name: "Chá", items: ["Erva-doce sem adoçar"] }
+  ]},
+  { sub: "Dia 7 — último dia da Fase 1", tip: "Fim da Fase 1. A partir de amanhã começa a Fase 2 com o suco enzimático.", prep: "Para a Fase 2 compre: couve, maçã verde, pepino, espinafre fresco e salsão. O suco é feito todo dia pela manhã em jejum.", meals: [
+    { time: "06h30", name: "Água morna com limão", items: ["1 copo em jejum"] },
+    { time: "07h30", name: "Tapioca de ovo com salsinha", items: ["3 col. sopa goma de tapioca","1 ovo mexido com salsinha e cebolinha verde","Sal e azeite"] },
+    { time: "10h00", name: "Lanche", items: ["Cenoura em palito + sal e limão"] },
+    { time: "12h30", name: "Frango grelhado com batata-doce e salada", items: ["150g peito de frango grelhado","Pasta de tempero + limão","1 batata-doce na air fryer","Alface + pepino + pimentão"] },
+    { time: "15h30", name: "Lanche", items: ["1 ovo cozido + chá de gengibre com limão"] },
+    { time: "19h00", name: "Arroz com frango e legumes", items: ["Sobra de frango desfiado","1/2 xíc. arroz branco","Cenoura e abobrinha com azeite e cúrcuma","Salsinha e cebolinha verde por cima"] },
+    { time: "21h00", name: "Chá", items: ["Camomila — celebra o fim da Fase 1"] }
+  ]}
+];
+
+function buildDayTabs(startVal) {
+  const tabsEl = document.getElementById('day-tabs');
+  const panelsEl = document.getElementById('day-panels');
+  tabsEl.innerHTML = '';
+  panelsEl.innerHTML = '';
+
+  let startDate = null;
+  if (startVal) {
+    startDate = new Date(startVal + 'T12:00:00');
+  }
+
+  dayTemplates.forEach((day, idx) => {
+    let label;
+    if (startDate) {
+      const d = new Date(startDate);
+      d.setDate(d.getDate() + idx);
+      label = d.toLocaleDateString('pt-BR', { day: '2-digit', month: '2-digit' });
+    } else {
+      label = 'Dia ' + (idx + 1);
+    }
+
+    const tab = document.createElement('button');
+    tab.className = 'day-tab' + (idx === 0 ? ' active' : '');
+    tab.textContent = label;
+    tab.onclick = () => {
+      document.querySelectorAll('.day-tab').forEach((t,i) => t.classList.toggle('active', i===idx));
+      document.querySelectorAll('.day-panel').forEach((p,i) => p.classList.toggle('active', i===idx));
+    };
+    tabsEl.appendChild(tab);
+
+    const panel = document.createElement('div');
+    panel.className = 'day-panel' + (idx === 0 ? ' active' : '');
+    let html = `<div class="section-label">${label} — ${day.sub}</div><div class="meal-grid">`;
+    day.meals.forEach(m => {
+      html += `<div class="meal-card"><div class="meal-time">${m.time}</div><div class="meal-name">${m.name}</div><ul class="meal-items">${m.items.map(i=>`<li>${i}</li>`).join('')}</ul></div>`;
+    });
+    html += `</div>`;
+    if (day.prep) html += `<div class="prep-note">${day.prep}</div>`;
+    html += `<div class="day-tip">${day.tip}</div>`;
+    panel.innerHTML = html;
+    panelsEl.appendChild(panel);
+  });
+}
+
+// Build default tabs (no date)
+buildDayTabs('');
+
+// CHAT
+const SYSTEM_PROMPT = `Você é um assistente especializado no Protocolo C, programa de 30 dias focado em saúde intestinal, redução de zonulina, desinflamação e eliminação de gordura abdominal.
+
+Fases: Fase 1 (7 dias) Low-FODMAP — proibido glúten, alho, cebola, laticínios, feijão, brócolis, industrializados, álcool. Permitido: ovos, frango, peixes, arroz branco, tapioca, batata-doce, batata-inglesa, abobrinha, cenoura, pimentão, pepino, espinafre, alface, cebolinha verde (só parte verde), salsinha, salsão, mamão, limão, azeite, pasta de amendoim pura, cúrcuma, gengibre. Fase 2 (3 dias): suco enzimático matinal em jejum + alimentação leve. Fase 3 (20 dias): recolonização com butirato, aveia, feijão, kefir, chucrute, frutas vermelhas.
+
+A usuária se chama Pri. Equipamentos: fogão a gás, air fryer e microondas (sem forno convencional). Rotina corrida, prefere refeições de até 15 min.
+
+Quando descrever o que tem em casa: sugira 1 ou 2 opções práticas, adequadas à fase e ao tempo. Seja direta, sem introduções. Use listas curtas. Não use emojis. Sem linguagem genérica.`;
+
+async function sendMessage() {
+  const input = document.getElementById('chat-input');
+  const btn = document.getElementById('chat-send');
+  const text = input.value.trim();
+  if (!text) return;
+  appendMsg('user', text);
+  input.value = '';
+  btn.disabled = true;
+  const typing = document.createElement('div');
+  typing.className = 'msg bot'; typing.id = 'typing';
+  typing.innerHTML = '<div class="typing"><div class="dot"></div><div class="dot"></div><div class="dot"></div></div>';
+  document.getElementById('chat-messages').appendChild(typing);
+  scrollChat();
+  try {
+    const history = buildHistory();
+    const res = await fetch('https://api.anthropic.com/v1/messages', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ model: 'claude-sonnet-4-6', max_tokens: 1000, system: SYSTEM_PROMPT, messages: history })
+    });
+    const data = await res.json();
+    const reply = data.content?.[0]?.text || 'Não consegui processar. Tente novamente.';
+    document.getElementById('typing')?.remove();
+    appendMsg('bot', reply);
+  } catch(e) {
+    document.getElementById('typing')?.remove();
+    appendMsg('bot', 'Erro de conexão. Tente novamente.');
+  }
+  btn.disabled = false;
+}
+
+function buildHistory() {
+  const msgs = document.querySelectorAll('#chat-messages .msg');
+  const history = [];
+  let skipFirst = true;
+  msgs.forEach(m => {
+    if (m.id === 'typing') return;
+    const role = m.classList.contains('user') ? 'user' : 'assistant';
+    if (skipFirst && role === 'assistant') { skipFirst = false; return; }
+    history.push({ role, content: m.querySelector('.msg-bubble').innerText });
+  });
+  return history;
+}
+
+function appendMsg(role, text) {
+  const wrap = document.createElement('div');
+  wrap.className = 'msg ' + role;
+  const bubble = document.createElement('div');
+  bubble.className = 'msg-bubble';
+  bubble.innerHTML = text.replace(/\n/g,'<br>').replace(/\*\*(.*?)\*\*/g,'<strong>$1</strong>');
+  wrap.appendChild(bubble);
+  document.getElementById('chat-messages').appendChild(wrap);
+  scrollChat();
+}
+
+function scrollChat() {
+  const c = document.getElementById('chat-messages');
+  c.scrollTop = c.scrollHeight;
+}
+
+document.getElementById('chat-input').addEventListener('keydown', e => { if (e.key === 'Enter') sendMessage(); });
+</script>
+</body>
+</html>
